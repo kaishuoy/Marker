@@ -45,7 +45,7 @@ public class Diff {
 		// output
 		int i = 0, j = 0;
 		while (i < M && j < N) {
-			if (x[i].equals(y[j])) {
+			if (x[i].equals(y[j]) || equalityWithoutBlanks(x[i],y[j])) {
 				i++;
 				j++;
 			} else {
@@ -81,6 +81,19 @@ public class Diff {
 				System.out.println("< " + x[i++]);
 			}
 		}
+	}
+
+	/**
+	 * Checks two strings to see if they are the same after removing tabs,newlines and returns
+	 * @param string first string
+	 * @param string2 second string
+	 * @return whether or not they are equal
+	 */
+	private static boolean equalityWithoutBlanks(String string, String string2) {
+		String input = string.replaceAll("\t|\n|\r", "");
+		String input2 = string2.replaceAll("\t|\n|\r", "");
+		if(input.equals(input2))return true;
+		else return false;
 	}
 
 	//debugging purposes

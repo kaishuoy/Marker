@@ -31,8 +31,12 @@ public class Marker {
 	int addFiles = 0;
 	int missingFiles = 0;
 
+	private List<String> missing;
+	private List<String> additional;
 	public Marker() {
 		files = new ArrayList<String>();
+		missing = new ArrayList<String>();
+		additional = new ArrayList<String>();
 	}
 
 	/**
@@ -145,6 +149,7 @@ public class Marker {
 			if(studentCurrent.exists())	Diff.diff(new String[] { s, dir + s });
 			else {
 				System.out.println("ERROR: This file was not present in student submission");
+				missing.add(s);
 				missingFiles++;
 			}
 			
@@ -170,7 +175,8 @@ public class Marker {
 			filePath = String.join("/", filePathSplitList);
 
 			if (filePath.endsWith("java") && !files.contains(filePath)) {
-				System.out.println(f.getPath());
+				System.out.println(filePath);
+				additional.add(filePath);
 				Scanner sc = new Scanner(f);
 				addFiles++;
 				while (sc.hasNextLine()) {
@@ -212,7 +218,25 @@ public class Marker {
 				delete(c);
 		}
 		if(!f.delete()){
-			System.out.println("fail");
+			System.out.println("failed to delete file " +f.getPath());
+		}
+	}
+	
+	private void printResults(){
+		System.out.println("Parsing complete. \nNumber of files compared : " + files.size());
+		System.out.println("Number of additional files: " + addFiles);
+		if(addFiles!=0){
+			System.out.println("Additional filenames: ");
+			for(String s:additional){
+				System.out.println(s);
+			}
+		}
+		System.out.println("Number of missing files : "+missingFiles);
+		if(missingFiles!=0){
+			System.out.println("Missing filenames: ");
+			for(String s:missing){
+				System.out.println(s);
+			}
 		}
 	}
 
@@ -229,7 +253,7 @@ public class Marker {
 		// default debugging case
 		if (args.length == 0) {
 			System.out.println("Warning no arguments supplied, defaulting to debug arguments");
-			args = new String[] { "shapes.jar", "SWEN221A3.jar" };
+			args = new String[] { "master.jar", "student.jar" };
 		}
 		// create marker
 		Marker marker = new Marker();
@@ -239,6 +263,7 @@ public class Marker {
 
 		// attempt to cleanup previous students data
 		try {
+			System.out.println("Deleting previous files:");
 			marker.delete(directory);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -258,9 +283,7 @@ public class Marker {
 		System.out.println("Finished detecting additional files");
 
 		System.out.println("====================");
-		System.out.println("Parsing complete. \nNumber of files compared : " + marker.files.size());
-		System.out.println("Additional files : " + marker.addFiles);
-		System.out.println("Missing files : "+marker.missingFiles);
+		marker.printResults();
 
 	}
 
